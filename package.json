@@ -2,7 +2,7 @@
   "name": "kandev-plugin-brainstorm",
   "private": true,
   "type": "module",
-  "version": "0.1.0",
+  "version": "0.1.5",
   "engines": {
     "node": "^20.19.0 || >=22.12.0"
   },

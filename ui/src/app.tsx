@@ -261,7 +261,29 @@ export function BrainstormApp(props: AppProps) {
     return <div className="kbs-empty kbs-error">Could not load brainstorms: {loadError}</div>;
   }
 
-  const sessionList = !scope.single && (
+  // Narrow page: a one-line session switcher instead of the sessions column.
+  const sessionBar = !scope.single && compact && (
+    <div className="kbs-session-bar">
+      <select
+        className="kbs-session-select"
+        value={activeId ?? ""}
+        onChange={(e: Event) => setActiveId((e.target as HTMLSelectElement).value || null)}
+        aria-label="Brainstorm session"
+      >
+        {sessions.length === 0 && <option value="">No brainstorms yet</option>}
+        {sessions.map((s) => (
+          <option key={s.id} value={s.id}>
+            {s.title}
+          </option>
+        ))}
+      </select>
+      <ui.Button size="sm" variant="outline" onClick={createSession}>
+        + New
+      </ui.Button>
+    </div>
+  );
+
+  const sessionList = sessionBar || (!scope.single && (
     <aside className="kbs-sessions">
       <ui.Button size="sm" onClick={createSession} className="kbs-new">
         + New brainstorm
@@ -297,7 +319,7 @@ export function BrainstormApp(props: AppProps) {
         ))}
       </div>
     </aside>
-  );
+  ));
 
   if (!active) {
     return (

@@ -1,6 +1,6 @@
 id: "kandev-plugin-brainstorm"
 api_version: 1
-version: "0.1.0"
+version: "0.1.5"
 display_name: "Brainstorm"
 description: "Think out loud with an agent. A Brainstorm page and task panel where a concise partner builds on your ideas, challenges them, and converges the conversation into stages, decisions, and next actions you can launch as Kandev tasks."
 author: "Prithpal-Sooriya"

@@ -92,7 +92,7 @@ func BuildPrompt(req TurnRequest, personaNotes string) string {
 	if req.Mode == ModeConverge {
 		b.WriteString("\n\nNow output the JSON object.")
 	} else {
-		b.WriteString("\n\nNow write your reply to the person (just the reply, no speaker label).")
+		b.WriteString("\n\nNow write your reply to the person. Wrap the entire reply in <reply> and </reply> tags, with nothing else outside them (no speaker label).")
 	}
 	return b.String()
 }
