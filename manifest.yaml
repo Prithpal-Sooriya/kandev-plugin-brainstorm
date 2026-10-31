@@ -1,0 +1,62 @@
+id: "kandev-plugin-brainstorm"
+api_version: 1
+version: "0.1.0"
+display_name: "Brainstorm"
+description: "Think out loud with an agent. A Brainstorm page and task panel where a concise partner builds on your ideas, challenges them, and converges the conversation into stages, decisions, and next actions you can launch as Kandev tasks."
+author: "Prithpal-Sooriya"
+categories: ["tools"]
+license: "MIT"
+homepage: "https://github.com/Prithpal-Sooriya/kandev-plugin-brainstorm"
+repo_url: "https://github.com/Prithpal-Sooriya/kandev-plugin-brainstorm"
+
+# Actions with access control and the browser conversation facade need
+# 0.91.1+; the agent-profile config picker and task panels shipped later.
+# The SDK this is built against is pinned in .kandev-sdk-ref (v0.97.0).
+min_kandev_version: "0.97.0"
+
+capabilities:
+  # One-shot utility-agent completions for every brainstorm turn.
+  agent_invoke: true
+  # Per-user session storage through host.storage (no server-side state).
+  user_state: true
+  # Read the attached task's title/description for the task panel.
+  api_read: ["tasks"]
+
+webhooks:
+  - key: "turn"
+    description: "Browser-only. POST starts an agent turn (202 {id}); GET ?id= polls it. Agent turns can outlast the 15s action budget, hence a webhook with polling."
+    method: "POST"
+    access: authenticated
+    max_body_bytes: 1048576
+
+actions:
+  - key: "task.context"
+    scope: "task"
+    max_body_bytes: 1024
+
+config_schema:
+  type: object
+  properties:
+    agent_profile:
+      type: string
+      format: agent-profile
+      title: "Brainstorm agent profile"
+      description: "Agent profile that plays the brainstorming partner. Leave empty to use Kandev's default utility agent."
+    persona_notes:
+      type: string
+      title: "Extra partner guidance"
+      description: "Optional instructions appended to the partner's persona, e.g. your team's vocabulary or preferred planning style."
+
+ui:
+  bundle: "/ui/bundle.js"
+  styles:
+    - "/ui/plugin.css"
+
+runtime:
+  type: binary
+  executables:
+    darwin-amd64: "server/plugin-darwin-amd64"
+    darwin-arm64: "server/plugin-darwin-arm64"
+    linux-amd64: "server/plugin-linux-amd64"
+    linux-arm64: "server/plugin-linux-arm64"
+    windows-amd64: "server/plugin-windows-amd64.exe"

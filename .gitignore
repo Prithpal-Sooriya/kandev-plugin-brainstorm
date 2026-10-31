@@ -1,0 +1,6 @@
+/bin/
+/.build/
+/node_modules/
+*.tar.gz
+.DS_Store
+/ui/bundle.js

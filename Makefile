@@ -1,0 +1,78 @@
+.PHONY: deps build test test-backend test-ui typecheck vet fmt check-format \
+	bundle package package-host package-file clean
+
+# BIN and VERSION must match manifest.yaml's id and version.
+BIN := bin/kandev-plugin-brainstorm
+VERSION := 0.1.0
+STAGE := .build/stage
+PKG_OUT := $(notdir $(BIN))-$(VERSION).tar.gz
+
+# Sibling kandev checkout at the .kandev-sdk-ref commit (see README). plugin-pack
+# runs inside it so its dependencies resolve against kandev's own go.sum.
+KANDEV_SDK := ../kandev-sdk/apps/backend
+
+PLATFORMS := linux/amd64 linux/arm64 darwin/amd64 darwin/arm64 windows/amd64
+
+## Frontend dev deps (plugin-sdk, esbuild, typescript, vitest).
+deps:
+	@test -d node_modules || npm install --no-audit --no-fund
+
+build:
+	mkdir -p bin
+	go build -o $(BIN) ./server
+
+test: test-backend typecheck test-ui
+
+test-backend:
+	go test -race ./...
+
+test-ui: deps
+	npm run test:ui
+
+typecheck: deps
+	npm run typecheck
+
+vet:
+	go vet ./...
+
+fmt:
+	gofmt -w server
+
+check-format:
+	@out="$$(gofmt -l server)"; if [ -n "$$out" ]; then echo "gofmt needed:"; echo "$$out"; exit 1; fi
+
+bundle: deps
+	npm run build:ui
+
+define stage_common
+	rm -rf $(STAGE)
+	mkdir -p $(STAGE)/server $(STAGE)/ui
+	cp manifest.yaml $(STAGE)/manifest.yaml
+	cp ui/bundle.js ui/plugin.css $(STAGE)/ui/
+endef
+
+## All-platform archive (release artifact).
+package: bundle
+	$(stage_common)
+	@set -e; for p in $(PLATFORMS); do \
+		os=$${p%/*}; arch=$${p#*/}; ext=""; [ "$$os" = windows ] && ext=".exe"; \
+		echo "building $$os/$$arch"; \
+		CGO_ENABLED=0 GOOS=$$os GOARCH=$$arch go build -trimpath -o $(STAGE)/server/plugin-$$os-$$arch$$ext ./server; \
+	done
+	cd $(KANDEV_SDK) && go run ./cmd/plugin-pack -dir $(CURDIR)/$(STAGE) -out $(CURDIR)/$(PKG_OUT)
+	rm -rf $(STAGE)
+	@echo "Wrote $(PKG_OUT)"
+
+## Host-platform-only archive (fast local install / CI smoke).
+package-host: bundle
+	$(stage_common)
+	CGO_ENABLED=0 go build -trimpath -o $(STAGE)/server/plugin-$$(go env GOOS)-$$(go env GOARCH)$$(go env GOEXE) ./server
+	cd $(KANDEV_SDK) && go run ./cmd/plugin-pack -dir $(CURDIR)/$(STAGE) -out $(CURDIR)/$(PKG_OUT) -platform-only
+	rm -rf $(STAGE)
+	@echo "Wrote $(PKG_OUT)"
+
+package-file:
+	@printf '%s\n' "$(PKG_OUT)"
+
+clean:
+	rm -rf bin .build $(notdir $(BIN))-*.tar.gz

@@ -1,0 +1,363 @@
+/* kandev-plugin-brainstorm
+ *
+ * Self-contained styles: Kandev's Tailwind build does not scan plugin
+ * bundles, so utilities are not reliable here. Colors come from Kandev's own
+ * CSS custom properties, so light, dark and custom themes follow along.
+ */
+
+.kbs-page,
+.kbs-panel {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+}
+
+.kbs-root {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr) minmax(280px, 380px);
+  color: var(--foreground);
+  font-size: 0.875rem;
+}
+
+.kbs-root--compact {
+  display: flex;
+  flex-direction: column;
+}
+
+.kbs-muted { color: var(--muted-foreground); }
+.kbs-small { font-size: 0.75rem; }
+.kbs-pad { padding: 0.75rem; }
+.kbs-error { color: var(--destructive); }
+
+.kbs-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+.kbs-welcome { grid-column: 2 / 4; }
+.kbs-welcome h3 { font-size: 1.125rem; font-weight: 600; margin: 0; }
+.kbs-welcome p { max-width: 32rem; margin: 0; line-height: 1.5; }
+
+/* Sessions column */
+
+.kbs-sessions {
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.kbs-new { margin: 0.75rem; }
+
+.kbs-session-list {
+  overflow-y: auto;
+  flex: 1;
+  padding: 0 0.5rem 0.75rem;
+}
+
+.kbs-session {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  padding: 0.5rem 1.75rem 0.5rem 0.625rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+}
+
+.kbs-session:hover { background: var(--accent); }
+.kbs-session--active { background: color-mix(in oklab, var(--primary) 12%, transparent); }
+
+.kbs-session-title {
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kbs-session-meta { font-size: 0.7rem; color: var(--muted-foreground); }
+
+.kbs-icon-btn {
+  border: 0;
+  background: transparent;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+}
+
+.kbs-icon-btn:hover { color: var(--destructive); }
+
+.kbs-session-delete {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.25rem;
+  opacity: 0;
+}
+
+.kbs-session:hover .kbs-session-delete,
+.kbs-session--active .kbs-session-delete { opacity: 1; }
+
+/* Chat column */
+
+.kbs-chat {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  flex: 1;
+}
+
+.kbs-chat-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.kbs-title-input {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid transparent;
+  background: transparent;
+  color: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 0.25rem 0.375rem;
+  border-radius: 0.375rem;
+}
+
+.kbs-title-input:hover,
+.kbs-title-input:focus { border-color: var(--border); outline: none; }
+
+.kbs-messages {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.kbs-hint { margin: auto; max-width: 28rem; text-align: center; line-height: 1.5; }
+.kbs-hint p { margin: 0 0 0.5rem; }
+
+.kbs-msg {
+  max-width: min(46rem, 92%);
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.75rem;
+  line-height: 1.5;
+}
+
+.kbs-msg--user {
+  align-self: flex-end;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-bottom-right-radius: 0.25rem;
+}
+
+.kbs-msg--assistant {
+  align-self: flex-start;
+  background: var(--muted);
+  border-bottom-left-radius: 0.25rem;
+}
+
+.kbs-msg--error {
+  background: color-mix(in oklab, var(--destructive) 12%, transparent);
+  color: var(--destructive);
+}
+
+.kbs-msg--pending { display: flex; align-items: center; gap: 0.5rem; }
+
+.kbs-plain { margin: 0; white-space: pre-wrap; word-break: break-word; }
+
+.kbs-mode-tag {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  margin-bottom: 0.375rem;
+  background: color-mix(in oklab, var(--primary) 15%, transparent);
+  color: var(--primary);
+}
+
+.kbs-mode-tag--challenge {
+  background: color-mix(in oklab, var(--destructive) 15%, transparent);
+  color: var(--destructive);
+}
+
+.kbs-md p, .kbs-md ul, .kbs-md ol { margin: 0 0 0.5rem; }
+.kbs-md > :last-child { margin-bottom: 0; }
+.kbs-md ul, .kbs-md ol { padding-left: 1.25rem; }
+.kbs-md ul { list-style: disc; }
+.kbs-md ol { list-style: decimal; }
+.kbs-md h4 { font-weight: 600; margin: 0.5rem 0 0.25rem; }
+
+.kbs-md code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8em;
+  padding: 0.05rem 0.3rem;
+  border-radius: 0.25rem;
+  background: color-mix(in oklab, var(--foreground) 8%, transparent);
+}
+
+.kbs-composer {
+  border-top: 1px solid var(--border);
+  padding: 0.625rem 0.75rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.kbs-textarea { resize: none; min-height: 3rem; }
+
+.kbs-composer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.kbs-modes, .kbs-send { display: flex; gap: 0.375rem; align-items: center; }
+
+.kbs-link {
+  border: 0;
+  background: transparent;
+  color: var(--primary);
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.125rem 0.25rem;
+  white-space: nowrap;
+}
+
+.kbs-link:hover { text-decoration: underline; }
+
+/* Board column */
+
+.kbs-board {
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+}
+
+.kbs-root--compact .kbs-board { border-left: 0; flex: 1; }
+
+.kbs-board-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.kbs-board-header h4 { margin: 0; font-weight: 600; }
+.kbs-board-actions { display: flex; gap: 0.25rem; }
+
+.kbs-board-body {
+  overflow-y: auto;
+  flex: 1;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.kbs-board-body p { margin: 0; }
+
+.kbs-board-section h5 {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted-foreground);
+  margin: 0 0 0.375rem;
+}
+
+.kbs-board-section ul,
+.kbs-board-section ol {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.kbs-board-section ul { list-style: disc; }
+.kbs-stages { list-style: decimal; }
+.kbs-stages li { display: flex; flex-direction: column; }
+
+.kbs-board-section .kbs-items { list-style: none; padding: 0; gap: 0.375rem; }
+
+.kbs-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem 0.625rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--card);
+}
+
+.kbs-item > div { display: flex; flex-direction: column; gap: 0.125rem; min-width: 0; }
+
+.kbs-status {
+  align-self: flex-start;
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background: var(--muted);
+  color: var(--muted-foreground);
+}
+
+.kbs-status--chosen {
+  background: color-mix(in oklab, var(--primary) 15%, transparent);
+  color: var(--primary);
+}
+
+.kbs-done { font-size: 0.7rem; color: var(--muted-foreground); white-space: nowrap; }
+
+/* Compact (task panel / phone) */
+
+.kbs-compact { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+
+.kbs-tabs {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.375rem 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.kbs-tab {
+  border: 0;
+  background: transparent;
+  color: var(--muted-foreground);
+  padding: 0.375rem 0.625rem;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.kbs-tab--on { color: var(--foreground); border-bottom-color: var(--primary); }
