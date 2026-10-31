@@ -133,12 +133,12 @@ func runTurn(ctx context.Context, host pluginsdk.Host, cfg config, turn brainsto
 		result, perr := brainstorm.ParseConverge(text)
 		if perr != nil {
 			// Keep the agent's words rather than failing the turn outright.
-			return brainstorm.TurnResult{Reply: strings.TrimSpace(text) +
+			return brainstorm.TurnResult{Reply: brainstorm.ExtractReply(text) +
 				"\n\n_(The board could not be updated: the agent did not return valid JSON. Try Converge again.)_"}, nil
 		}
 		return result, nil
 	}
-	return brainstorm.TurnResult{Reply: strings.TrimSpace(text)}, nil
+	return brainstorm.TurnResult{Reply: brainstorm.ExtractReply(text)}, nil
 }
 
 func friendlyAgentError(err error) error {

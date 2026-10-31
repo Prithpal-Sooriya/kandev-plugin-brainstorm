@@ -44,6 +44,17 @@ func TestParseConvergeAcceptsTopLevelBoard(t *testing.T) {
 	}
 }
 
+func TestParseConvergeSkipsUnrelatedObjects(t *testing.T) {
+	text := `config {"theme":"dark"} then {} and finally {"reply":"r","board":{"goal":"real"}}`
+	got, err := ParseConverge(text)
+	if err != nil || got.Board.Goal != "real" || got.Reply != "r" {
+		t.Fatalf("got %+v err %v", got, err)
+	}
+	if _, err := ParseConverge(`{"reply":"x","board":{}}`); err == nil {
+		t.Error("an empty board should be rejected")
+	}
+}
+
 func TestParseConvergeRejectsProse(t *testing.T) {
 	if _, err := ParseConverge("no json here {not json"); err == nil {
 		t.Fatal("expected error")
@@ -142,5 +153,22 @@ func TestJobsBusyAndRetention(t *testing.T) {
 	jobs.now = func() time.Time { return now.Add(2 * time.Minute) }
 	if _, ok := jobs.Get(id); ok {
 		t.Error("finished job should expire after retention")
+	}
+}
+
+func TestExtractReply(t *testing.T) {
+	cases := map[string]string{
+		"---\n## Skills\n- /path/SKILL.md\n<reply>\nHello there.\n</reply>": "Hello there.",
+		"---\n\n## Skills\n- /a/SKILL.md\n\n## Prompts\n- /use-memory\n\n## Extensions\n- /x/jira.ts\n- https://github.com/o/r\n- [object Object]\nThe real answer.\n- with a bullet": "The real answer.\n- with a bullet",
+		"- **Idea** - a diverge bullet\n- /not-a-banner": "- **Idea** - a diverge bullet\n- /not-a-banner",
+		"plain answer  ":                                 "plain answer",
+		"banner <reply>unterminated answer":              "unterminated answer",
+		"<reply>first</reply> noise <reply>last</reply>": "last",
+		"<reply>   </reply> fallback text":               "fallback text",
+	}
+	for in, want := range cases {
+		if got := ExtractReply(in); got != want {
+			t.Errorf("ExtractReply(%q) = %q, want %q", in, got, want)
+		}
 	}
 }

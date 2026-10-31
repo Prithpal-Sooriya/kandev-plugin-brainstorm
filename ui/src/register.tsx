@@ -36,10 +36,30 @@ function useActiveWorkspace(): string | null {
   return id;
 }
 
+// Below this page width the three columns get too tight; switch to the
+// tabbed compact layout with a session dropdown.
+const COMPACT_BELOW_PX = 980;
+
+function useNarrow(threshold: number) {
+  const [value, setValue] = React.useState(false);
+  const [el, setEl] = React.useState<HTMLElement | null>(null);
+  React.useEffect(() => {
+    if (!el) return undefined;
+    // Measure once now: ResizeObserver only reports on the next layout frame.
+    setValue(el.getBoundingClientRect().width < threshold);
+    if (typeof ResizeObserver === "undefined") return undefined;
+    const observer = new ResizeObserver(([entry]) => setValue(entry.contentRect.width < threshold));
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [el, threshold]);
+  return { value, ref: setEl };
+}
+
 function BrainstormPage() {
   const workspaceId = useActiveWorkspace();
   const writerId = React.useMemo(() => host.utils.generateUUID(), []);
   const { isMobile } = host.useResponsiveBreakpoint();
+  const narrow = useNarrow(COMPACT_BELOW_PX);
   const scope = React.useMemo(
     () => (workspaceId ? { scope: "workspace" as const, scopeId: workspaceId, single: false } : null),
     [workspaceId],
@@ -48,8 +68,14 @@ function BrainstormPage() {
     return <div className="kbs-empty kbs-muted">Select a workspace to start brainstorming.</div>;
   }
   return (
-    <div className="kbs-page">
-      <BrainstormApp key={scope.scopeId} scope={scope} workspaceId={workspaceId} compact={isMobile} writerId={writerId} />
+    <div className="kbs-page" ref={narrow.ref}>
+      <BrainstormApp
+        key={scope.scopeId}
+        scope={scope}
+        workspaceId={workspaceId}
+        compact={isMobile || narrow.value}
+        writerId={writerId}
+      />
     </div>
   );
 }
